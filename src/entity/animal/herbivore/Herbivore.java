@@ -1,7 +1,7 @@
 package entity.animal.herbivore;
 
 import entity.animal.Animal;
-import config.AnimalSpecies;
+import config.type.AnimalSpecies;
 
 public class Herbivore extends Animal {
 

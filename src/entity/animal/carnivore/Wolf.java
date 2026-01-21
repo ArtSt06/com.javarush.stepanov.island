@@ -1,6 +1,6 @@
 package entity.animal.carnivore;
 
-import config.AnimalSpecies;
+import config.type.AnimalSpecies;
 
 public class Wolf extends Carnivore {
     public Wolf() {

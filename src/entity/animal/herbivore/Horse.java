@@ -1,6 +1,6 @@
 package entity.animal.herbivore;
 
-import config.AnimalSpecies;
+import config.type.AnimalSpecies;
 
 public class Horse extends Herbivore {
     public Horse() {

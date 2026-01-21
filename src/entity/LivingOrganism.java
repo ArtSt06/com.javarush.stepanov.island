@@ -1,25 +1,28 @@
 package entity;
 
+import config.type.Species;
 import entity.island.Location;
 
 public abstract class LivingOrganism {
-    private final Double weight;
-    private final Integer maxNumberOnCell;
+    private final Species species;
     private Location currentLocation;
     private Boolean isAlive;
 
-    protected LivingOrganism(Double weight, Integer maxNumberOnCell) {
-        this.weight = weight;
-        this.maxNumberOnCell = maxNumberOnCell;
+    protected LivingOrganism(Species species) {
+        this.species = species;
         this.isAlive = true;
     }
 
     public Double getWeight() {
-        return this.weight;
+        return species.getWeight();
     }
 
     public Integer getMaxNumberOnCell() {
-        return this.maxNumberOnCell;
+        return species.getMaxNumberOnCell();
+    }
+
+    public Location getLocation() {
+        return currentLocation;
     }
 
     public void setLocation(Location location) {
@@ -27,10 +30,11 @@ public abstract class LivingOrganism {
     }
 
     public Boolean isAlive() {
-        return this.isAlive;
+        return isAlive;
     }
 
     public void die() {
         this.isAlive = false;
+        currentLocation.removeOrganism(this);
     }
 }

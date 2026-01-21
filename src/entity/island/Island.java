@@ -1,20 +1,38 @@
 package entity.island;
 
-public class Island {
+import config.Settings;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public final class Island {
+    private static Island instance;
+
     private final Integer islandWidth;
     private final Integer islandHeight;
     private final Location[][] locations;
+    private final List<Location> locationsList;
 
-    public Island(Integer width, Integer height) {
-        this.islandWidth = width;
-        this.islandHeight = height;
-        this.locations = new Location[height][width];
+    private Island() {
+        this.islandWidth = Settings.MAP_SIZE_X;
+        this.islandHeight = Settings.MAP_SIZE_Y;
+        this.locations = new Location[islandHeight][islandWidth];
+        this.locationsList = new ArrayList<>();
 
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                locations[y][x] = new Location(x, y);
+        for (int y = 0; y < islandHeight; y++) {
+            for (int x = 0; x < islandWidth; x++) {
+                Location newLocation = new Location(x, y, this);
+                locations[y][x] = newLocation;
+                locationsList.add(newLocation);
             }
         }
+    }
+
+    public static synchronized Island getInstance() {
+        if (instance == null) {
+            instance = new Island();
+        }
+        return instance;
     }
 
     public Integer getIslandWidth() {
@@ -30,5 +48,9 @@ public class Island {
             return locations[cordY][cordX];
         }
         return null;
+    }
+
+    public List<Location> getAllLocations() {
+        return locationsList;
     }
 }
