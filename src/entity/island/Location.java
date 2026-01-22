@@ -13,19 +13,19 @@ import java.util.ArrayList;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Location {
-    private final Island island;
-
     private final Integer coordinateX;
+
     private final Integer coordinateY;
+
     private final EnumMap<AnimalSpecies, List<Animal>> animalsMap = new EnumMap<>(AnimalSpecies.class);
+
     private final EnumMap<PlantSpecies, List<Plant>> plantsMap = new EnumMap<>(PlantSpecies.class);
 
-    final ReentrantLock lock = new ReentrantLock(true);
+    final ReentrantLock lock = new ReentrantLock();
 
-    public Location(Integer cordX, Integer cordY, Island island) {
+    public Location(Integer cordX, Integer cordY) {
         this.coordinateX = cordX;
         this.coordinateY = cordY;
-        this.island = island;
     }
 
     public Integer getCoordinateX() {
@@ -45,7 +45,8 @@ public class Location {
             throw new IllegalArgumentException("No such animal species");
         }
 
-        return animalsMap.getOrDefault(species, new ArrayList<Animal>() {});
+        return animalsMap.getOrDefault(species, new ArrayList<>() {
+        });
     }
 
     public Integer getAllAnimalsCount() {
@@ -61,30 +62,18 @@ public class Location {
             throw new IllegalArgumentException("No such plant species");
         }
 
-        return plantsMap.getOrDefault(species, new ArrayList<Plant>() {});
-    }
-
-
-    public Integer getAllPlantsCount() {
-        int count = 0;
-        for (PlantSpecies plantSpecies : plantsMap.keySet()) {
-            count += getPlantsBySpecies(plantSpecies).size();
-        }
-        return count;
+        return plantsMap.getOrDefault(species, new ArrayList<>() {
+        });
     }
 
     public Boolean canSupportMoreSuchAnimals(AnimalSpecies species) {
-        if (getAllAnimalsCount() >= Settings.MAX_ANIMALS_ON_CELL) {
+        if (getAllAnimalsCount() >= Settings.MapConfig.MAX_ANIMALS_ON_CELL) {
             return false;
         }
 
         int animalsOfThisType = getAnimalsBySpecies(species).size();
 
-        if (animalsOfThisType >= species.getMaxNumberOnCell()) {
-            return false;
-        }
-
-        return true;
+        return animalsOfThisType < species.getMaxNumberOnCell();
     }
 
     public Boolean addAnimal(Animal animal) {
@@ -130,7 +119,7 @@ public class Location {
     }
 
     public void removeOrganism(LivingOrganism organism) {
-        if (organism == null || organism.isAlive()) {
+        if (organism == null) {
             return;
         }
 

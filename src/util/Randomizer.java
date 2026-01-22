@@ -4,7 +4,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public final class Randomizer {
     private Randomizer() {
-    };
+    }
 
     public static Integer nextInt(int max) {
         return ThreadLocalRandom.current().nextInt(max);

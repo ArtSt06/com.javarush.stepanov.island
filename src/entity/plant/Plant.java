@@ -3,6 +3,7 @@ package entity.plant;
 import entity.LivingOrganism;
 import config.type.PlantSpecies;
 import repository.PlantFactory;
+import util.Randomizer;
 
 public class Plant extends LivingOrganism {
     private  final PlantSpecies species;
@@ -16,11 +17,11 @@ public class Plant extends LivingOrganism {
         return species;
     }
 
-    public String getEmoji() {
-        return species.getEmoji();
-    }
-
     public void grow() {
-        this.getLocation().addPlant(PlantFactory.createPlant(this.species));
+        int plantsToGrow = Randomizer.nextInt(1, this.getMaxNumberOnCell() / 2);
+
+        for (int i = 0; i < plantsToGrow; i++) {
+            this.getLocation().addPlant(PlantFactory.createPlant(this.species));
+        }
     }
 }

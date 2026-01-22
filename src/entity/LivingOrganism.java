@@ -5,8 +5,11 @@ import entity.island.Location;
 
 public abstract class LivingOrganism {
     private final Species species;
+
     private Location currentLocation;
+
     private Boolean isAlive;
+
 
     protected LivingOrganism(Species species) {
         this.species = species;

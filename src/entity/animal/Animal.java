@@ -51,7 +51,7 @@ public abstract class Animal extends LivingOrganism {
     }
 
     public void decreaseSatiety() {
-        this.currentSatiety -= Settings.SATIETY_DECREASE_PER_TICK;
+        this.currentSatiety = this.currentSatiety - Settings.AnimalConfig.SATIETY_DROP_PER_TICK;
 
         if (currentSatiety <= 0) {
             this.die();
@@ -59,7 +59,7 @@ public abstract class Animal extends LivingOrganism {
     }
 
     public void decreaseSatiety(Double diff) {
-        this.currentSatiety -= diff;
+        this.currentSatiety = this.currentSatiety - diff;
 
         if (currentSatiety <= 0) {
             this.die();
@@ -75,11 +75,11 @@ public abstract class Animal extends LivingOrganism {
     }
 
     public void restartReproductionCooldown() {
-        this.reproductionCooldown = Settings.REPRODUCTION_COOLDOWN;
+        this.reproductionCooldown = Settings.AnimalConfig.REPRODUCTION_COOLDOWN;
     }
 
     public Boolean eat() {
-        if (this.currentSatiety >= 1.0) {
+        if (this.getCurrentSatiety() >= 1.0) {
             return false;
         }
 
@@ -95,16 +95,34 @@ public abstract class Animal extends LivingOrganism {
                 } else if (species instanceof PlantSpecies plantSpecies) {
                     availableFood.addAll(currentLocation.getPlantsBySpecies(plantSpecies));
                 }
+            } else {
                 break;
             }
         }
 
         if (!availableFood.isEmpty()) {
-            while (currentSatiety < 0.5) {
-                LivingOrganism food = availableFood.get(Randomizer.nextInt(availableFood.size()));
-                this.increaseSatiety(food.getWeight() / this.getFoodRequired());
+            do {
+                LivingOrganism food;
+
+                if (this.getCurrentSatiety() < Settings.AnimalConfig.SATIETY_VALUE_BEFORE_STARVATION) {
+                    food = availableFood.stream()
+                            .filter(LivingOrganism::isAlive)
+                            .sorted(Comparator.comparingDouble(LivingOrganism::getWeight).reversed())
+                            .toList()
+                            .getFirst();
+                } else {
+                    food = availableFood.get(Randomizer.nextInt(availableFood.size()));
+                }
+
+                Double nutrientsConsumed = this.getFoodRequired() > 0 ? food.getWeight() / this.getFoodRequired() : food.getWeight();
+
+                this.increaseSatiety(nutrientsConsumed);
                 currentLocation.removeOrganism(food);
-            }
+
+                if (food instanceof Animal) {
+                    break;
+                }
+            } while (this.getCurrentSatiety() < Settings.AnimalConfig.SATIETY_ENOUGH_FOR_REPRODUCTION);
             return true;
         }
 
@@ -130,9 +148,9 @@ public abstract class Animal extends LivingOrganism {
 
         int animalsOfThisType = destination.getAnimalsBySpecies(this.getSpecies()).size();
 
-        if (allAnimalsPopulation < Settings.MAX_ANIMALS_ON_CELL && animalsOfThisType < this.getMaxNumberOnCell()) {
+        if (allAnimalsPopulation < Settings.MapConfig.MAX_ANIMALS_ON_CELL && animalsOfThisType < this.getMaxNumberOnCell()) {
             if (destination.addAnimal(this)) {
-                this.decreaseSatiety(Settings.SATIETY_DECREASE_AFTER_MOVEMENT);
+                this.decreaseSatiety(Settings.AnimalConfig.SATIETY_DROP_AFTER_MOVEMENT);
                 currentLocation.removeOrganism(this);
             }
         }
@@ -154,7 +172,7 @@ public abstract class Animal extends LivingOrganism {
             Integer deltaY = Math.abs((currentY - y));
             for (int x = minX; x < maxX; x++) {
                 Integer deltaX = Math.abs((currentX - x));
-                Integer routeLength = deltaX + deltaY;
+                int routeLength = deltaX + deltaY;
                 if (routeLength <= movementRange && routeLength != 0) {
                     locations.add(Island.getInstance().getLocation(x, y));
                 }
@@ -173,12 +191,12 @@ public abstract class Animal extends LivingOrganism {
         if (partner.isPresent()) {
             Location currentLocation = this.getLocation();
 
-            if (Randomizer.nextDouble() <= Settings.REPRODUCTION_CHANCE) {
+            if (Randomizer.nextDouble() <= Settings.AnimalConfig.REPRODUCTION_CHANCE) {
                 Animal offspring = AnimalFactory.createAnimal(this.getSpecies());
                 offspring.restartReproductionCooldown();
-                this.decreaseSatiety(Settings.SATIETY_DECREASE_AFTER_REPRODUCTION);
+                this.decreaseSatiety(Settings.AnimalConfig.SATIETY_DROP_AFTER_REPRODUCTION);
                 this.restartReproductionCooldown();
-                partner.get().decreaseSatiety(Settings.SATIETY_DECREASE_AFTER_REPRODUCTION);
+                partner.get().decreaseSatiety(Settings.AnimalConfig.SATIETY_DROP_AFTER_REPRODUCTION);
                 partner.get().restartReproductionCooldown();
                 currentLocation.addAnimal(offspring);
             }
@@ -186,8 +204,8 @@ public abstract class Animal extends LivingOrganism {
     }
 
     public Boolean canReproduce() {
-        if (this.getCurrentSatiety() < Settings.SATIETY_ENOUGH_FOR_REPRODUCTION ||
-                this.getReproductionCooldown() != 0) {
+        if (this.getCurrentSatiety() < Settings.AnimalConfig.SATIETY_ENOUGH_FOR_REPRODUCTION ||
+                this.getReproductionCooldown() > 0) {
             return false;
         }
 

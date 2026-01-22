@@ -14,14 +14,14 @@ public final class Island {
     private final List<Location> locationsList;
 
     private Island() {
-        this.islandWidth = Settings.MAP_SIZE_X;
-        this.islandHeight = Settings.MAP_SIZE_Y;
+        this.islandWidth = Settings.MapConfig.MAP_SIZE_X;
+        this.islandHeight = Settings.MapConfig.MAP_SIZE_Y;
         this.locations = new Location[islandHeight][islandWidth];
         this.locationsList = new ArrayList<>();
 
         for (int y = 0; y < islandHeight; y++) {
             for (int x = 0; x < islandWidth; x++) {
-                Location newLocation = new Location(x, y, this);
+                Location newLocation = new Location(x, y);
                 locations[y][x] = newLocation;
                 locationsList.add(newLocation);
             }

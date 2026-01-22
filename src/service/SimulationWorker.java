@@ -17,16 +17,16 @@ public final class SimulationWorker {
 
     private final ScheduledExecutorService ticker = Executors.newSingleThreadScheduledExecutor();
 
-    private final ExecutorService workers = Executors.newFixedThreadPool(Settings.SCHEDULER_POOL_SIZE);
+    private final ExecutorService workers = Executors.newFixedThreadPool(Settings.SimulationConfig.SCHEDULER_POOL_SIZE);
 
     private int tactCount = 0;
 
     public void start() {
         ticker.scheduleAtFixedRate(
                 this::tick,
-                Settings.SCHEDULER_INITIAL_DELAY,
-                Settings.SCHEDULER_DELAY,
-                Settings.SCHEDULER_TIMEUNIT
+                Settings.SimulationConfig.SCHEDULER_INITIAL_DELAY,
+                Settings.SimulationConfig.SCHEDULER_DELAY,
+                Settings.SimulationConfig.SCHEDULER_TIMEUNIT
         );
 
         System.out.println("Simulation is starting... \n");
@@ -57,8 +57,6 @@ public final class SimulationWorker {
             statisticService.showStatistics();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            // TODO
-            System.out.println("Ticker's down");
         }
 
         long tickEnd = System.currentTimeMillis();

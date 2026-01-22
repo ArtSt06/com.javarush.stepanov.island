@@ -49,19 +49,21 @@ public enum AnimalDiet {
             Map.entry(AnimalSpecies.DUCK, 0.80)
     ),
     HORSE_DIET,
-    DEER_DIET,
-    RABBIT_DIET,
     GOAT_DIET,
     SHEEP_DIET,
-    BUFFALO_DIET,
-    CATERPILLAR_DIET(
+    BUFFALO_DIET(
             Map.entry(PlantSpecies.GRASS, 1.00)
+    ),
+    CATERPILLAR_DIET,
+    RABBIT_DIET,
+    DEER_DIET(
+            Map.entry(PlantSpecies.GRASS, 1.00),
+
+            Map.entry(PlantSpecies.BERRY, 0.35) // Добавлен новый тип еды
     ),
     MOUSE_DIET(
             Map.entry(PlantSpecies.GRASS, 1.00),
-            Map.entry(AnimalSpecies.CATERPILLAR, 0.90),
-
-            Map.entry(PlantSpecies.BERRY, 0.65) // Добавлен новый тип еды
+            Map.entry(AnimalSpecies.CATERPILLAR, 0.90)
     ),
     DUCK_DIET(
             Map.entry(PlantSpecies.GRASS, 1.00),
@@ -70,9 +72,7 @@ public enum AnimalDiet {
     BOAR_DIET(
             Map.entry(PlantSpecies.GRASS, 1.00),
             Map.entry(AnimalSpecies.MOUSE, 0.50),
-            Map.entry(AnimalSpecies.CATERPILLAR, 0.90),
-
-            Map.entry(PlantSpecies.BERRY, 0.15) // Добавлен новый тип еды
+            Map.entry(AnimalSpecies.CATERPILLAR, 0.90)
     );
 
     private final Map<Species, Double> diet;
@@ -89,7 +89,7 @@ public enum AnimalDiet {
         }
 
         this.diet = unsortedDiet.entrySet().stream()
-                .sorted(Map.Entry.comparingByValue())
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
                         Map.Entry::getValue,

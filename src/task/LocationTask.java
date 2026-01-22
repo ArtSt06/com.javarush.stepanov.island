@@ -26,7 +26,7 @@ public class LocationTask implements Runnable {
             List<LivingOrganism> organisms = new ArrayList<>(location.getAllOrganisms());
             Collections.shuffle(organisms);
 
-            organisms.forEach(organism -> doTask(organism));
+            organisms.forEach(this::doTask);
 
             location.removeAllDeadOrganisms();
         } finally {
@@ -36,7 +36,9 @@ public class LocationTask implements Runnable {
 
     private void doTask(LivingOrganism organism) {
         if (organism instanceof Animal animal) {
-            AnimalLifecycleTask.startTask(animal);
+            if (animal.isAlive()) {
+                AnimalLifecycleTask.startTask(animal);
+            }
         } else if (organism instanceof Plant plant) {
             PlantLifecycleTask.startTask(plant);
         }
